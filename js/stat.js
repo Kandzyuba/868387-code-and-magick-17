@@ -1,9 +1,5 @@
 'use strict';
 
-// Переменные положения мага
-var fireballSize = 22;
-var wizardSpeed = 3;
-var wizardWidth = 70;
 // Переменные облака статистики
 var CLOUD_WIDTH = 420;
 var CLOUD_HEIGHT = 270;
@@ -15,23 +11,6 @@ var TEXT_WIDTH = 50;
 var BAR_HEIGHT = 150;
 var BAR_TEXT_X = CLOUD_X + MOVE * 5;
 var betweenColumn = 90;
-
-// Положение мага
-var getFireballSpeed = function (left) {
-  return (left) ? 5 : 2;
-};
-
-var getWizardHeight = function () {
-  return 1.337 * wizardWidth;
-};
-
-var getWizardX = function (width) {
-  return (width / 2) - wizardWidth / 2;
-};
-
-var getWizardY = function (height) {
-  return (height / 3 * 2) - getWizardHeight() / 2;
-};
 
 // Отрисовка облака статистики
 var renderCloud = function (ctx, x, y, color) {
