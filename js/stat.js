@@ -1,12 +1,25 @@
 'use strict';
 
+// Переменные положения мага
 var fireballSize = 22;
-var getFireballSpeed = function(left) {
-  return (left) ? 5 : 2;
-};
-
 var wizardSpeed = 3;
 var wizardWidth = 70;
+// Переменные облака статистики
+var CLOUD_WIDTH = 420;
+var CLOUD_HEIGHT = 270;
+var CLOUD_X = 100;
+var CLOUD_Y = 10;
+var HEADER_X = 120;
+var MOVE = 10;
+var TEXT_WIDTH = 50;
+var BAR_HEIGHT = 150;
+var BAR_TEXT_X = CLOUD_X + MOVE * 5;
+var betweenColumn = 90;
+
+// Положение мага
+var getFireballSpeed = function (left) {
+  return (left) ? 5 : 2;
+};
 
 var getWizardHeight = function () {
   return 1.337 * wizardWidth;
@@ -20,27 +33,25 @@ var getWizardY = function (height) {
   return (height / 3 * 2) - getWizardHeight() / 2;
 };
 
-var CLOUD_WIDTH = 420;
-var CLOUD_HEIGHT = 270;
-var CLOUD_X = 100;
-var CLOUD_Y = 10;
-var GAP = 10;
-var FONT_GAP = 15;
-var TEXT_WIDTH = 50;
-var BAR_HEIGHT = 150;
-var barWidth = 50;
-var histogramYbottom = CLOUD_Y + CLOUD_HEIGHT - GAP * 2;
-var betweenColumn = 90;
-var saturation = Math.floor(Math.random() * (100 - 0)) + 0 + '%';
-var zonder = 50 + '%';
-var randomColor = 'hsl(240, saturation, z)';
-
-var renderCloud = function(ctx, x, y, color) {
+// Отрисовка облака статистики
+var renderCloud = function (ctx, x, y, color) {
   ctx.fillStyle = color;
   ctx.fillRect(x, y, CLOUD_WIDTH, CLOUD_HEIGHT);
 };
 
-var getMaxElement = function(arr) {
+var headerText = function (ctx, text, y, color) {
+  ctx.fillStyle = color;
+  ctx.font = '16px, PT Mono';
+  ctx.fillText(text, HEADER_X, MOVE * y);
+};
+
+var barText = function (ctx, text, index, times, y, score, color, maxTime) {
+  ctx.fillStyle = color;
+  ctx.font = '16px, PT Mono';
+  ctx.fillText(text, BAR_TEXT_X + betweenColumn * index, CLOUD_Y + CLOUD_HEIGHT - MOVE * y - ((BAR_HEIGHT * times[index]) / maxTime - 10) * score);
+};
+
+var getMaxElement = function (arr) {
   var maxElement = arr[0];
 
   for (var i = 0; i < arr.length; i++) {
@@ -52,28 +63,32 @@ var getMaxElement = function(arr) {
   return maxElement;
 };
 
-window.renderStatistics = function(ctx, players, times) {
-  renderCloud(ctx, CLOUD_X + GAP, CLOUD_Y + GAP, 'rgba(0, 0, 0, 0.3)');
-  renderCloud(ctx, CLOUD_X, CLOUD_Y, '#fff');
-  ctx.fillStyle = 'black';
-  ctx.font = '16px, PT Mono'; //проверить
-  ctx.fillText('Ура вы победили!', 120, 40);
-  ctx.fillText('Список результатов:', 120, 60);
+var barColor = function (ctx, index, players) {
+  if (players[index] === 'Вы') {
+    ctx.fillStyle = 'rgba(255, 0, 0, 1)';
+  } else {
+    ctx.fillStyle = 'rgba(27, 54, 228,' + (Math.random() * (1 - 0.2) + 0.2) + ')';
+  }
+};
 
-  ctx.fillStyle = '#000';
+var renderBar = function (ctx, index, times, maxTime, players) {
+  barColor(ctx, index, players);
+  ctx.fillRect(CLOUD_X + betweenColumn * index + TEXT_WIDTH, CLOUD_Y + CLOUD_HEIGHT - MOVE * 4, 40, -(BAR_HEIGHT * times[index]) / maxTime);
+};
+
+// Метод объекта отвечающий за появление статистики
+window.renderStatistics = function (ctx, players, times) {
+  renderCloud(ctx, CLOUD_X + MOVE, CLOUD_Y + MOVE, 'rgba(0, 0, 0, 0.3)');
+  renderCloud(ctx, CLOUD_X, CLOUD_Y, '#fff');
+
+  headerText(ctx, 'Ура вы победили!', 4, 'black');
+  headerText(ctx, 'Список результатов:', 6, 'black');
 
   var maxTime = getMaxElement(times);
 
   for (var i = 0; i < players.length; i++) {
-    ctx.fillStyle = 'black';
-    ctx.fillText(players[i], CLOUD_X + GAP * 5 + betweenColumn * i, histogramYbottom);
-    ctx.fillText(Math.floor(times[i]), CLOUD_X + GAP * 5 + betweenColumn * i, CLOUD_Y + CLOUD_HEIGHT - GAP * 4 -(BAR_HEIGHT * times[i]) / maxTime - 10);
-    if (players[i] === 'Вы') {
-      ctx.fillStyle = 'red';
-    } else {
-      ctx.fillStyle = randomColor;
-    }
-    ctx.fillRect(CLOUD_X + betweenColumn * i + TEXT_WIDTH, CLOUD_Y + CLOUD_HEIGHT - GAP * 4, 40, -(BAR_HEIGHT * times[i]) / maxTime);
-
+    renderBar(ctx, i, times, maxTime, players);
+    barText(ctx, players[i], i, times, 2, 0, 'black', maxTime);
+    barText(ctx, Math.floor(times[i]), i, times, 6, 1, 'black', maxTime);
   }
 };
