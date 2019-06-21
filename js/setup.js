@@ -85,8 +85,9 @@ var fireballWrap = setup.querySelector('.setup-fireball-wrap');
 var fireballName = document.querySelector('input[name=fireball-color]');
 
 fireballWrap.addEventListener('click', function () {
-  fireballWrap.style.background = fireball[getRandomInRange(0, fireball.length - 1)];
-  fireballName.value = fireballWrap.style.background;
+  var colorFireball = fireball[getRandomInRange(0, fireball.length - 1)];
+  fireballWrap.style.background = colorFireball;
+  fireballName.value = colorFireball;
 });
 
 var similarListElement = setup.querySelector('.setup-similar-list');
